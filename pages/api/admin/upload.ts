@@ -36,21 +36,40 @@ const saveFile = async (file: formidable.File): Promise<string> => {
     return secure_url;
 }
 
+// const parseFiles = async (req: NextApiRequest): Promise<string> => {
+//     return new Promise((resolve, reject) => {
+
+//         const form = new formidable.IncomingForm();
+//         form.parse(req, async (err, fields, files) => {
+
+//             if (err) {
+//                 return reject(err)
+//             }
+
+//             const filePath = await saveFile(files.file as formidable.File)
+//             resolve(filePath)
+//         })
+//     })
+// }
+
 const parseFiles = async (req: NextApiRequest): Promise<string> => {
     return new Promise((resolve, reject) => {
-
         const form = new formidable.IncomingForm();
         form.parse(req, async (err, fields, files) => {
-
             if (err) {
-                return reject(err)
+                return reject(err);
             }
 
-            const filePath = await saveFile(files.file as formidable.File)
-            resolve(filePath)
-        })
-    })
-}
+            const uploadedFile = files.file as formidable.File | undefined;
+            if (!uploadedFile) {
+                return reject(new Error('No file was uploaded.'));
+            }
+
+            const filePath = await saveFile(uploadedFile);
+            resolve(filePath);
+        });
+    });
+};
 
 const uploadFile = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 
